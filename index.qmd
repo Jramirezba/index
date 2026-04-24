@@ -16,7 +16,7 @@ format:
     fontsize: 12pt
     toc: true
     toc-depth: 2
-    toc-location: left
+    toc-location: right
     number-sections: true
     code-fold: true
     code-summary: "Ver código"
@@ -37,7 +37,7 @@ knitr:
     fig.align: center
     fig.width: 6
     fig.height: 6
-    out.width: "80%"
+    out.width: "70%"
 bibliography: references.bib
 ---
 
@@ -58,7 +58,7 @@ options(
 <style>
 body{
   background-color:#FFFFFF;
-  font-size:130%;
+  font-size:110%;
   text-align:justify;
 }
 </style>
@@ -324,7 +324,7 @@ $$
 Una tabla típica contiene las siguientes columnas:
 
 | Clase | Marca de clase | Frecuencia absoluta | Frecuencia acumulada | Frecuencia relativa | Frecuencia relativa acumulada |
-|----|----|----|----|----|----|
+|------------|------------|------------|------------|------------|------------|
 | $C_i$ | $x_i$ | $f_i$ | $F_i$ | $h_i$ | $H_i$ |
 
 <br>
@@ -1105,49 +1105,24 @@ library(ggplot2)
 library(dplyr)
 library(readxl)
 
-data_grafico <- educacion %>%
-
-  filter(!is.na(Genero), !is.na(Estrato)) %>%
-
-  mutate(
-    Genero = factor(Genero, levels = c("Masculino", "Femenino")),
-    Estrato = factor(Estrato, levels = c("Bajo", "Medio", "Alto"))
-  ) %>%
+data_porcentaje <- educacion %>%
   count(Genero, Estrato) %>%
-  group_by() %>%
+  group_by(Genero) %>%
   mutate(porcentaje = n / sum(n) * 100)
 
-ggplot(data_grafico, aes(x = Genero, y = porcentaje, fill = Estrato)) +
-  # geom_col con position = "stack" crea el efecto apilado
-  geom_col(position = "stack", color = "black", linewidth = 0.3) +
-  
-  scale_fill_manual(values = c("Bajo" = "#E74C3C", "Medio" = "#F1C40F", "Alto" = "#2980B9")) +
-  
-  geom_text(
-    aes(label = sprintf("%.1f%%", porcentaje)),
-    position = position_stack(vjust = 0.5),
-    color = "white",
-    fontface = "bold",
-    size = 4
-  ) +
-  
-  labs(
-      title = "Distribución de Estratos por Genero ",
-      subtitle = "Gráfico de barras apiladas al 100%",
-      x = "Genero",
-      y = "Porcentaje ",
-      fill = "Estrato ",
-      caption = "Fuente: Datos del archivo educacion.xlsx"
-    ) +
-    
-    theme_minimal() +
-    theme(
-      plot.title = element_text(face = "bold", size = 14),
-      axis.text = element_text(face = "bold"),
-      legend.position = "right"
-  ) +
-  
-  coord_flip()
+ggplot(data_porcentaje, aes(x = Genero, y = porcentaje, fill = Estrato)) +
+  geom_bar(stat = "identity", position = "stack") +
+  labs(title = "Distribución porcentual de Estrato por Genero",
+       x = "Genero",
+       y = "Porcentaje",
+       fill = "Estrato") +
+  theme_minimal() +
+  geom_text(aes(label = sprintf("%.1f%%", porcentaje)), 
+            position = position_stack(vjust = 0.5), 
+            color = "white",
+            size = 4) +
+
+coord_flip()
 ```
 
 ## Interpretación
